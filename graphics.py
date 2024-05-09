@@ -1,4 +1,4 @@
-from tkinter import Tk, BOTH, Canvas
+from tkinter import Tk, BOTH, Canvas, Text
 
 class Window:
     def __init__(self, width, height):
@@ -9,6 +9,11 @@ class Window:
         self._is_running = False
         self._root.protocol("WM_DELETE_WINDOW", self.close)
 
+        # Adding some text
+        self._canvas.create_text(150, 50, text = "Solve the Maze", fill="black", font=('Helvetica 36 bold'))
+     
+        
+
     # will redraw all the graphics in the window
     def redraw(self):
         self._root.update_idletasks()
@@ -16,6 +21,7 @@ class Window:
 
     def draw_line(self, line, fill_color="black"):
         line.draw(self._canvas, fill_color)
+
     #change state of is_running
     def wait_for_close(self):
         self._is_running = True
