@@ -60,6 +60,8 @@ class Tests(unittest.TestCase):
             False,
         )
 
+    def test_maze_reset_cells(self):
+        pass
 
 
     

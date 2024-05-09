@@ -1,8 +1,7 @@
 from graphics import *
-import random
 
 class Cell:
-    def __init__(self,win = None, seed = None):
+    def __init__(self,win = None):
         self._x1 = None
         self._x2 = None
         self._y1 = None
@@ -12,12 +11,8 @@ class Cell:
         self.has_right_wall = True
         self.has_top_wall = True
         self.has_bottom_wall = True
-        # for random seed generation
-        self._seed = seed
-        #keeps track of cells that had their walls broken
-        self._visited = False
-        if self._seed is not None:
-            random.seed(seed)
+        self.visited = False
+       
 
 
     def draw(self, x1, y1, x2, y2):
@@ -69,11 +64,7 @@ class Cell:
         line = Line(Point(x_center,y_center), Point(x_center2,y_center2))
         self._win.draw_line(line, fill_color)
 
-    # depth first traversal through cells, breaking walls as it goes
-    # keeping track of which cells were traversed of course
-    def _break_walls_r(self, i , j):
-        self._cells[i][j]._visited = True
-        while True:
-            to_visit = []
+                
+
             
 

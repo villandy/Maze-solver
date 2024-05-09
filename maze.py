@@ -1,6 +1,7 @@
-from graphics import *
-from cell import *
+
+from cell import Cell
 import time
+import random
 
 class Maze:
     # holds all the cells in the maze in a 2-D grid
@@ -13,6 +14,7 @@ class Maze:
             cell_size_x,
             cell_size_y,
             win = None,
+            seed = None
             
     ):
         self._cells = []
@@ -23,9 +25,14 @@ class Maze:
         self._cell_size_x = cell_size_x
         self._cell_size_y = cell_size_y
         self._win = win
-        
+        #for random seed generation
+        if seed:
+            random.seed(seed)
 
         self._create_cells()
+        self._break_entrance_and_exit()
+        self._break_walls_rdfs(0,0)
+        self._reset_cells_visited()
         
 
     # fills a list with lists of cells.
@@ -65,3 +72,68 @@ class Maze:
         self._cells[self._num_cols - 1][self._num_rows -1].has_bottom_wall = False
         self._draw_cell(self._num_cols - 1, self._num_rows - 1)
 
+    # depth first traversal through cells, breaking walls as it goes
+    # keeping track of which cells were traversed of course
+    def _break_walls_rdfs(self, i , j):
+        self._cells[i][j].visited = True
+        while True:
+            index_to_visit = []
+            # determining adjacent LEFT cell
+            if i > 0 and not self._cells[i-1][j].visited:
+                index_to_visit.append((i - 1, j))
+            
+            # determining adjacent right cell
+            if i < self._num_cols - 1 and not self._cells[i+1][j].visited:
+                index_to_visit.append((i + 1, j))
+
+            # determining adjacent top cell
+            if j > 0 and not self._cells[i][j-1].visited:
+                index_to_visit.append((i, j - 1))
+            
+            #determing adjacent bottom cell
+            if j < self._num_rows - 1 and not self._cells[i][j+1].visited:
+                index_to_visit.append((i , j + 1))
+
+            # if nowhere to go, draw the cell and break out
+            if len(index_to_visit) == 0:
+                self._draw_cell(i,j)
+                return
+            
+            # otherwise pick a random direction
+            # uses randrange 
+            rand_dirction_index = random.randrange(len(index_to_visit))
+            next_index = index_to_visit[rand_dirction_index]
+
+            # knock walls of current direction: left
+            # wall breaking works both ways ie. cell || curr_cell
+            # if current row cell to the left
+            if next_index[0] == i - 1:
+                self._cells[i - 1][j].has_right_wall = False
+                self._cells[i][j].has_left_wall = False
+
+            # knock walls of current direction: right
+            # if current row cell to the right 
+            if next_index[0] == i + 1:
+                self._cells[i + 1][j].has_left_wall = False
+                self._cells[i][j].has_right_wall = False          
+
+            #knock walls of current direction: up
+            if next_index[1] == j - 1:
+                self._cells[i][j - 1].has_top_wall = False
+                self._cells[i][j].has_top_wall = False
+
+            #knock walls of current direction: down
+            if next_index[1] == j + 1:
+                self._cells[i][j + 1].has_bottom_wall = False
+                self._cells[i][j].has_bottom_wall = False
+            
+            # recursively move to chosen cell
+            # where next[0] is the row position
+            # next[1] is  is the column position
+            self._break_walls_rdfs(next_index[0], next_index[1])
+
+    # resets all the cells in the Maze to False
+    def _reset_cells_visited(self):
+        for column in self._cells:
+            for cell in column:
+                cell.visited = False
